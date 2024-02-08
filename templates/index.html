@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+{% include "includes/head.html" %}
+
+<body>
+    <form action="/" method="POST">
+        <label for="package_name">package_name</label>
+        <input type="text" name="package_name" /required>
+        <button type="submit">Crawl</button>
+    </form>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                {% if table %}
+                {{table | safe}}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
