@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
 import numpy as np
 import pandas as pd 
 from  google_play_scraper import Sort, reviews
@@ -14,6 +14,7 @@ nlp = pipeline(
 )
 
 app = Flask(__name__)
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
@@ -31,12 +32,14 @@ def index():
         df=df.join(pd.DataFrame(df.pop('review').tolist()))
 
         
-        df.rename(columns={'userName': 'Username', 'content': 'Review', 'score': 'Rating', 'userImage': 'User Image'}, inplace=True)
+        df.rename(columns={'userName': 'Username', 'content': 'Review', 
+                           'score': 'Rating', 'userImage': 'User Image'}, inplace=True)
+        
         df = df[['User Image', 'Username', 'Review', 'Rating']]
 
 
-        df['User Image'] = df['User Image'].apply(
-        lambda x: f'<img src="{x}" width="50" height="50">')
+        df['User Image'] = df['User Image'].apply
+        (lambda x: f'<img src="{x}" width="50" height="50">')
     
         table_classes = 'table table-responsive table-stripped'
 
@@ -50,7 +53,16 @@ def index():
 @app.route("/api/predict", methods='POST')
 def prediction():
     if request.method == "POST":
-        pass
+        input_data = request.get_json()
+        text = input_data['text']
+        result = nlp('text')
+        return jsonify({
+            "status":{
+                "code":200,
+                "message": "Success predicting the sentiment"
+            }, "data": {
+                "sentiment": result}
+        }),200
     else:
         return "jsonify"({
             "status":{
