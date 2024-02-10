@@ -3,25 +3,9 @@
 {% include "includes/head.html" %}
 
 <body>
-<<<<<<< HEAD
-    <form action="/" method="POST">
-        <label for="package_name">package_name</label>
-        <input type="text" name="package_name" /required>
-        <button type="submit">Crawl</button>
-    </form>
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                {% if table %}
-                {{table | safe}}
-                {% endif %}
-            </div>
-        </div>
-    </div>
-=======
 
     <!-- use HTMX -->
-    <div class="row text-center">
+    <!-- <div class="row text-center">
         <div class="col-lg-12">
             <h1>Sentiment Analysis Crawler</h1>
             <form id="crawl-form" hx-post="/" hx-target="#crawl-form" hx-swap="outerHTML">
@@ -39,11 +23,11 @@
                 {{ table|safe }}
             </div>
         </div>
-    </div>
+    </div> -->
     <!-- use HTMX -->
 
     <!-- not using HTMX -->
-    <!-- <div class="row text-center">
+    <div class="row text-center">
         <div class="col-lg-12">
             <h1>Sentiment Analysis Crawler</h1>
             <form action="/" method="post">
@@ -62,7 +46,7 @@
                 {{ table|safe }}
             </div>
         </div>
-    </div> -->
+    </div>
     <!-- not using HTMX -->
 
     <script>
@@ -128,7 +112,7 @@
             };
         }
     </script>
->>>>>>> ed698d4 (InitialCommit)
+
 </body>
 
 </html>
