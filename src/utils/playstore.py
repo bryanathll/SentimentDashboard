@@ -16,7 +16,7 @@ class Playstore:
 
         for playstore_review in playstore_reviews:
             result.appen({
-                'user': playstore_review['userName'],
+                'user': playstore_review[ 'userName' ],
                 'review': playstore_review['content'],
                 'user_image': playstore_review['userImage'],
                 'score': playstore_review['score']
