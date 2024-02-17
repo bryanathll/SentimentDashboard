@@ -9,7 +9,7 @@ class Playstore:
             lang='id',
             country='id',
             sort=Sort.MOST_RELEVANT,
-            count=100
+            count=10
         )
 
         result = []
