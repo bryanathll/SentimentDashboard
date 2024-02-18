@@ -54,9 +54,10 @@
                     this.loading = true;
                     this.$nextTick(() => {
                         const reviewsTable = document.querySelector(".table")
-                        const reviewTexts = [...reviewsTable.querySelector("tr"),].slice(1).map((tr) => {
-                            return tr.children[2].innerText; //assuming the review text is the third column
-                        });
+                        const reviewTexts = [...reviewsTable.querySelector("tr"),].slice(1)
+                            .map((tr) => {
+                                return tr.children[2].innerText; //assuming the review text is the third column
+                            });
 
                         // call your API endpoint with the texts for sentiment analysis
                         fetch('/api/predict', {
@@ -77,7 +78,90 @@
                             });
                     });
                 },
-            }
+
+                // ----------- Update Table Sentiment -----------
+                updateTableWithSentiments(reviewTable, sentiments) {
+                    // Add a new column header for sentiments if not added yet
+                    const headerRow = reviewTable.querySelector("tr");
+                    const numColumns = headerRow.children.length;
+
+                    if (numColumns === 4) {
+                        const sentimentTh = document.createElement("th");
+                        sentimentTh.innerText = "Sentiment";
+                        headerRow.appendChild(sentimentTh)
+                    }
+
+                    // sum the scores based on labels
+                    const scoresSum = {};
+                    sentiments.forEach((sentiment) => {
+                        const label = sentiment[0].label;
+                        const score = sentiment[0].score;
+                        scoresSum[label] = (scoresSum[label] || 0) + score;
+                    });
+
+                    // update each row with the sentiment analysis result
+                    const rows = [...reviewTabel.querySelector("tr")].slice(1); //exclue the header row
+                    rows.forEach((tr, index) => {
+                        const sentimentResult = sentiments[index][0];
+
+                        //return value in column sentiment
+                        const sentimentText = `${sentimentResult.label}
+                                               (${sentimentResult.score.toFixed(2)})`;
+
+                        //check if sentiment cell already exist, if not, create it
+                        if (tr.children.length === numColumns) {
+                            const sentimentTd = document.createElement("td");
+                            sentimentTd.innerText = sentimentText;
+                            tr.appendChild(sentimentTd);
+                        }
+                        else {
+                            //update existing sentiment cell
+                            tr.children[numColumns].innerText = sentimentText
+                        }
+                    });
+                    this.updatecanvas(scoresSum)
+                },
+
+                updatecanvas(scoresSum) {
+                    // assming scoresSum is an object with labels as keys and summed scores as values
+                    const labels = object.keys(scoresSum);
+                    const scores = object.values(scoresSum).map((score) =>
+                        score.toFixed(2)
+                    );
+
+                    var ctx = document.getElementById("sentimentChart").getContext("2d")
+                    var myChart = new Chart(ctx, {
+                        type: "pie",
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: "Labels Sentiment Score",
+                                    data: scores,
+                                    backgroundColor: [
+                                        "rgba(255, 99, 132, 0.2)",
+                                        "rgba(75, 192, 192, 0.2)",
+                                        "rgba(169, 169, 169, 0.2)",
+                                    ],
+                                    borderColor: [
+                                        "rgba(255, 99, 132, 1)",
+                                        "rgba(75, 192, 192, 1)",
+                                        "rgba(169, 169, 169, 1)",
+                                    ],
+                                    borderWidth: 1
+                                },
+                            ],
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                },
+                            },
+                        },
+                    });
+                },
+            };
         }
     </script>
 
