@@ -1,6 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
-{% include "includes/head.html" %}
+
+<head>
+    <style>
+        .loading-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #202020;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        a {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            text-decoration: none;
+            border-radius: 10px;
+            background-color: #37517E;
+            color: #f1f1f1;
+            border-radius: 10px;
+            transition: background-color 0.5 ease-in-out;
+        }
+
+        a:hover {
+            background-color: #375170;
+        }
+
+        footer {
+            background-color: #202020;
+            color: #f1f1f1;
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
 
 <body>
 
@@ -27,92 +81,15 @@
     <!-- use HTMX -->
 
     <!-- not using HTMX -->
-    <div class="row text-center">
-        <div class="col-lg-12">
-            <h1>Sentiment Analysis Crawler</h1>
-            <form action="/" method="post">
-                <label for="package_name">Package Name</label>
-                <input type="text" name="package_name" required />
-                <button type="submit">Crawl</button>
-            </form>
-        </div>
-    </div>
 
-    <div x-data="sentimentApp()" x-init="fetchAndPredict()" class="container">
-        <div class="row">
-            <div class="col-lg-12 mt-3">
-                <div x-show="loading" class="loading-indicator">Loading sentiments...</div>
-
-                {{ table|safe }}
-            </div>
-        </div>
-    </div>
     <!-- not using HTMX -->
 
-    <script>
-        function sentimentApp() {
-            return {
-                loading: false, // Loading state indicator
-
-                reviews: [],
-                fetchAndPredict() {
-                    this.loading = true;
-                    this.$nextTick(() => {
-                        const reviewsTable = document.querySelector(".table");
-                        const reviewTexts = [...reviewsTable.querySelectorAll("tr")].slice(1).map((tr) => {
-                            return tr.children[2].innerText; // Assuming the review text is the third column
-                        });
-
-                        // Call your API endpoint with the texts for sentiment analysis
-                        fetch("/api/predict", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({ texts: reviewTexts }),
-                        })
-                            .then((response) => response.json())
-                            .then((data) => {
-                                this.updateTableWithSentiments(reviewsTable, data.data.sentiments);
-                                this.loading = false;
-                            });
-                    });
-                },
-
-                updateTableWithSentiments(reviewsTable, sentiments) {
-                    // Add a new column header for Sentiments if not added yet
-                    const headerRow = reviewsTable.querySelector("tr");
-                    if (headerRow.querySelectorAll("th").length === 4) {
-                        // Assuming there are originally 4 columns
-                        const sentimentTh = document.createElement("th");
-                        sentimentTh.innerText = "Sentiment";
-                        headerRow.appendChild(sentimentTh);
-                    }
-
-                    // Update each row with the sentiment analysis result
-                    const rows = [...reviewsTable.querySelectorAll("tr")].slice(1); // Exclude the header row
-                    rows.forEach((tr, index) => {
-                        // Extract the sentiment label and score from the API response
-                        // Each result is an array with one object, so we access the first element.
-                        const sentimentResult = sentiments[index][0]; // Get the first item of the nested array
-                        const sentimentText = `${sentimentResult.label} (${sentimentResult.score.toFixed(2)})`;
-
-                        // Check if sentiment cell already exists; if not, create it
-                        if (tr.children.length === 4) {
-                            // Assuming there are originally 4 columns
-                            const sentimentTd = document.createElement("td");
-                            sentimentTd.innerText = sentimentText;
-                            tr.appendChild(sentimentTd);
-                        } else {
-                            // Update existing sentiment cell
-                            tr.children[4].innerText = sentimentText;
-                        }
-                    });
-                },
-            };
-        }
-    </script>
-
 </body>
+<main>
+    <h1>Welcome</h1>
+    <h4>This app to crawl and predict the sentiment</h4>
+    <a href="{{ url_for('crawl_playstore')}}">Crawl Playstore Comments</a>
+</main>
+<footer> &copy; braincore.Product </footer>
 
 </html>
