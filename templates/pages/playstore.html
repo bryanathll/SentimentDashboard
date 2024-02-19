@@ -39,8 +39,8 @@
 
     <div class="container">
         <h4>Visualisasi Score Sentiment</h4>
-        <div class="col-lg-12 pt-5">
-            <canvas id="sentimentChart" widht="200" height="50"></canvas>
+        <div class="col-lg-6 pt-5">
+            <canvas id="sentimentChart" widht="500" height="150"></canvas>
         </div>
     </div>
 
@@ -133,12 +133,14 @@
 
                 updatecanvas(scoresSum) {
                     // assming scoresSum is an object with labels as keys and summed scores as values
-                    const labels = object.keys(scoresSum);
-                    const scores = object.values(scoresSum).map((score) =>
+                    const labels = Object.keys(scoresSum);
+                    const scores = Object.values(scoresSum).map((score) =>
                         score.toFixed(2)
                     );
 
-                    var ctx = document.getElementById("sentimentChart").getContext("2d")
+                    var ctx = document.getElementById("sentimentChart")
+                        .getContext("2d");
+
                     var myChart = new Chart(ctx, {
                         type: "pie",
                         data: {
