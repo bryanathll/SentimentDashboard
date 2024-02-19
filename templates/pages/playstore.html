@@ -32,7 +32,7 @@
                 <div x-show="loading" class="loading-indicator">
                     Loading sentiments...
                 </div>
-                {{table|safe}}
+                {{ table|safe }}
             </div>
         </div>
     </div>
@@ -53,36 +53,46 @@
                 fetchAndPredict() {
                     this.loading = true;
                     this.$nextTick(() => {
-                        const reviewsTable = document.querySelector(".table")
-                        const reviewTexts = [...reviewsTable.querySelector("tr"),].slice(1)
+                        const reviewsTable =
+                            document.querySelector(".table");
+                        const reviewTexts = [
+                            ...reviewsTable.querySelectorAll("tr"),
+                        ]
+                            .slice(1)
                             .map((tr) => {
-                                return tr.children[2].innerText; //assuming the review text is the third column
+                                return tr.children[2].innerText; // Assuming the review text is the third column
                             });
 
-                        // call your API endpoint with the texts for sentiment analysis
-                        fetch('/api/predict', {
-                            method: 'POST',
+                        // Call your API endpoint with the texts for sentiment analysis
+                        fetch("/api/predict", {
+                            method: "POST",
                             headers: {
-                                'Content-Type': 'application/json',
+                                "Content-Type": "application/json",
                             },
                             body: JSON.stringify({ texts: reviewTexts }),
                         })
                             .then((response) => response.json())
                             .then((data) => {
-                                this.updateTableWithSentiments(reviewTable, data.data.sentiments);
+                                this.updateTableWithSentiments(
+                                    reviewsTable,
+                                    data.data.sentiments
+                                );
                                 this.loading = false;
                             })
                             .catch((error) => {
-                                console.error("Error fetching and predicting:", error);
+                                console.error(
+                                    "Error fetching and predicting:",
+                                    error
+                                );
                                 this.loading = false;
                             });
                     });
                 },
 
                 // ----------- Update Table Sentiment -----------
-                updateTableWithSentiments(reviewTable, sentiments) {
+                updateTableWithSentiments(reviewsTable, sentiments) {
                     // Add a new column header for sentiments if not added yet
-                    const headerRow = reviewTable.querySelector("tr");
+                    const headerRow = reviewsTable.querySelector("tr");
                     const numColumns = headerRow.children.length;
 
                     if (numColumns === 4) {
@@ -100,13 +110,12 @@
                     });
 
                     // update each row with the sentiment analysis result
-                    const rows = [...reviewTabel.querySelector("tr")].slice(1); //exclue the header row
+                    const rows = [...reviewsTable.querySelectorAll("tr")].slice(1); //exclue the header row
                     rows.forEach((tr, index) => {
                         const sentimentResult = sentiments[index][0];
 
                         //return value in column sentiment
-                        const sentimentText = `${sentimentResult.label}
-                                               (${sentimentResult.score.toFixed(2)})`;
+                        const sentimentText = `${sentimentResult.label}(${sentimentResult.score.toFixed(2)})`;
 
                         //check if sentiment cell already exist, if not, create it
                         if (tr.children.length === numColumns) {

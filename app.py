@@ -4,7 +4,7 @@ from src.utils.config import APP_SECRET_KEY
 from transformers import pipeline
 
 app = Flask(__name__)
-app.config['SECRET_KEY']= APP_SECRET_KEY
+app.config['SECRET_KEY'] = APP_SECRET_KEY
 
 pretrained_name = "w11wo/indonesian-roberta-base-sentiment-classifier"
 
@@ -14,27 +14,29 @@ nlp = pipeline(
     tokenizer=pretrained_name
 )
 
-Playstore = playstore.Playstore()
+playstore = playstore.Playstore()
 
-@app.route("/", methods=["GET", "POST"])
-def index():
+@app.route("/", methods=["GET"])
+def hello_api():
         return render_template("index.html")
 
 @app.route("/playstore", methods=['POST','GET'])
 def crawl_playstore():
-    if request == 'POST':
+    if request.method == 'POST':
         try:
-               package_name = request.form('package_name')
+            package_name = request.form['package_name']
 
-               processed_result_html = playstore.crawl(package_name)
+            processed_result_html = playstore.crawl(package_name)
                
-               if not processed_result_html:
-                    flash('No result found for the specified package name.')
-                    return redirect(url_for('crawl_playstore'))
-               return render_template('pages/playstore.html', table=processed_result_html, package_name=package_name)
+            if not processed_result_html:
+                # handle the case when result is empty
+                flash('No results found for the specified package name.')
+                return redirect(url_for('crawl_playstore'))
+            
+            return render_template('pages/playstore.html', table=processed_result_html, package_name=package_name)
 
         except Exception as e:
-            flash('No result found for the specified package name.')
+            flash('No results found for the specified package name.')
             return redirect(url_for('crawl_playstore'))
     else:
         return render_template("pages/playstore.html")
@@ -45,7 +47,6 @@ def prediction():
         input_data = request.get_json()
         texts = input_data["texts"]  # Expecting a list of texts
         results = [nlp(text) for text in texts]
-        print(results)
         return jsonify({
             "status": {
                 "code": 200,
@@ -67,4 +68,6 @@ def prediction():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True,
+            host="0.0.0.0",
+            port=8080)
